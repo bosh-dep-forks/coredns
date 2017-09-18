@@ -29,10 +29,6 @@ func setup(c *caddy.Controller) error {
 		return ca
 	})
 
-	// Export the capacity for the metrics. This only happens once, because this is a re-load change only.
-	cacheCapacity.WithLabelValues(Success).Set(float64(ca.pcap))
-	cacheCapacity.WithLabelValues(Denial).Set(float64(ca.ncap))
-
 	return nil
 }
 
