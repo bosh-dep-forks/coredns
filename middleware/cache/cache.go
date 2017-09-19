@@ -34,6 +34,13 @@ type Cache struct {
 	percentage int
 }
 
+func NewCache() *Cache {
+	ca := &Cache{pcap: defaultCap, ncap: defaultCap, pttl: maxTTL, nttl: maxNTTL, prefetch: 0, duration: 1 * time.Minute}
+	ca.pcache = cache.New(ca.pcap)
+	ca.ncache = cache.New(ca.ncap)
+	return ca
+}
+
 // Return key under which we store the item, -1 will be returned if we don't store the
 // message.
 // Currently we do not cache Truncated, errors zone transfers or dynamic update messages.
@@ -108,9 +115,6 @@ func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
 
 	if key != -1 {
 		w.set(res, key, mt, duration)
-
-		cacheSize.WithLabelValues(Success).Set(float64(w.pcache.Len()))
-		cacheSize.WithLabelValues(Denial).Set(float64(w.ncache.Len()))
 	}
 
 	if w.prefetch {

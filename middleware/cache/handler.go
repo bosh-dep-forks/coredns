@@ -7,7 +7,6 @@ import (
 	"github.com/coredns/coredns/request"
 
 	"github.com/miekg/dns"
-	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
 )
 
@@ -67,53 +66,11 @@ func (c *Cache) get(now time.Time, qname string, qtype uint16, do bool) (*item, 
 	k := hash(qname, qtype, do)
 
 	if i, ok := c.ncache.Get(k); ok {
-		cacheHits.WithLabelValues(Denial).Inc()
 		return i.(*item), i.(*item).ttl(now)
 	}
 
 	if i, ok := c.pcache.Get(k); ok {
-		cacheHits.WithLabelValues(Success).Inc()
 		return i.(*item), i.(*item).ttl(now)
 	}
-	cacheMisses.Inc()
 	return nil, 0
-}
-
-var (
-	cacheSize = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: middleware.Namespace,
-		Subsystem: subsystem,
-		Name:      "size",
-		Help:      "The number of elements in the cache.",
-	}, []string{"type"})
-
-	cacheCapacity = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: middleware.Namespace,
-		Subsystem: subsystem,
-		Name:      "capacity",
-		Help:      "The cache's capacity.",
-	}, []string{"type"})
-
-	cacheHits = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: middleware.Namespace,
-		Subsystem: subsystem,
-		Name:      "hits_total",
-		Help:      "The count of cache hits.",
-	}, []string{"type"})
-
-	cacheMisses = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: middleware.Namespace,
-		Subsystem: subsystem,
-		Name:      "misses_total",
-		Help:      "The count of cache misses.",
-	})
-)
-
-const subsystem = "cache"
-
-func init() {
-	prometheus.MustRegister(cacheSize)
-	prometheus.MustRegister(cacheCapacity)
-	prometheus.MustRegister(cacheHits)
-	prometheus.MustRegister(cacheMisses)
 }
