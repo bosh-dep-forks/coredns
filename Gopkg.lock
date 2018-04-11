@@ -287,12 +287,6 @@
   revision = "24818f796faf91cd76ec7bddd72458fbced7a6c1"
 
 [[projects]]
-  name = "github.com/google/uuid"
-  packages = ["."]
-  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
-  version = "0.2"
-
-[[projects]]
   branch = "master"
   name = "github.com/grpc-ecosystem/grpc-opentracing"
   packages = ["go/otgrpc"]
@@ -349,11 +343,10 @@
   packages = [
     ".",
     "caddyfile",
-    "onevent/hook",
     "startupshutdown"
   ]
-  revision = "d3f338ddab9ee24b376b5c9c51e202581e2d43ba"
-  version = "v0.10.11"
+  revision = "bc56793d3b919b17080deaa427bb5f70a826f4d6"
+  version = "v0.10.9"
 
 [[projects]]
   name = "github.com/opentracing/opentracing-go"
@@ -661,6 +654,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "548670edbbea9f980de09f6236d4ce2832ccec9100551b0aa19e9661bae42fd1"
+  inputs-digest = "4234be16373a3669e2a5dbbbfb9165a0502ab230428781418ab3458594261de0"
   solver-name = "gps-cdcl"
   solver-version = 1

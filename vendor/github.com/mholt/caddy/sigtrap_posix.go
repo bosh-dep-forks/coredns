@@ -1,17 +1,3 @@
-// Copyright 2015 Light Code Labs, LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 // +build !windows,!plan9,!nacl
 
 package caddy
@@ -31,25 +17,32 @@ func trapSignalsPosix() {
 
 		for sig := range sigchan {
 			switch sig {
-			case syscall.SIGQUIT:
-				log.Println("[INFO] SIGQUIT: Quitting process immediately")
-				for _, f := range OnProcessExit {
-					f() // only perform important cleanup actions
+			case syscall.SIGTERM:
+				log.Println("[INFO] SIGTERM: Terminating process")
+				if PidFile != "" {
+					os.Remove(PidFile)
 				}
 				os.Exit(0)
 
-			case syscall.SIGTERM:
-				log.Println("[INFO] SIGTERM: Shutting down servers then terminating")
-				exitCode := executeShutdownCallbacks("SIGTERM")
-				for _, f := range OnProcessExit {
-					f() // only perform important cleanup actions
-				}
+			case syscall.SIGQUIT:
+				log.Println("[INFO] SIGQUIT: Shutting down")
+				exitCode := executeShutdownCallbacks("SIGQUIT")
 				err := Stop()
 				if err != nil {
-					log.Printf("[ERROR] SIGTERM stop: %v", err)
+					log.Printf("[ERROR] SIGQUIT stop: %v", err)
 					exitCode = 3
 				}
+				if PidFile != "" {
+					os.Remove(PidFile)
+				}
 				os.Exit(exitCode)
+
+			case syscall.SIGHUP:
+				log.Println("[INFO] SIGHUP: Hanging up")
+				err := Stop()
+				if err != nil {
+					log.Printf("[ERROR] SIGHUP stop: %v", err)
+				}
 
 			case syscall.SIGUSR1:
 				log.Println("[INFO] SIGUSR1: Reloading")
@@ -77,7 +70,7 @@ func trapSignalsPosix() {
 				}
 
 				// Kick off the restart; our work is done
-				_, err = inst.Restart(caddyfileToUse)
+				inst, err = inst.Restart(caddyfileToUse)
 				if err != nil {
 					log.Printf("[ERROR] SIGUSR1: %v", err)
 				}
@@ -87,9 +80,6 @@ func trapSignalsPosix() {
 				if err := Upgrade(); err != nil {
 					log.Printf("[ERROR] SIGUSR2: upgrading: %v", err)
 				}
-
-			case syscall.SIGHUP:
-				// ignore; this signal is sometimes sent outside of the user's control
 			}
 		}
 	}()

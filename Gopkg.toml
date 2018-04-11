@@ -16,9 +16,9 @@ ignored = [
   go-tests = true
 
 [[constraint]]
-    name = "github.com/openzipkin/zipkin-go-opentracing"
-    version = "v0.2.3"
+  name = "github.com/openzipkin/zipkin-go-opentracing"
+  version = "v0.2.3"
 
 [[constraint]]
   name = "github.com/mholt/caddy"
-  version = "0.10.9"
+  version = "=0.10.9"
