@@ -1,7 +1,4 @@
 ignored = [
-    "github.com/mholt/caddy",
-    "github.com/mholt/caddy/caddyfile",
-    "github.com/mholt/caddy/startupshutdown",
     "github.com/miekg/dns",
     "golang.org/x/net/context",
     "golang.org/x/net/context/ctxhttp",
@@ -13,6 +10,15 @@ ignored = [
     "golang.org/x/net/trace",
 ]
 
+[prune]
+  unused-packages = true
+  non-go = true
+  go-tests = true
+
 [[constraint]]
     name = "github.com/openzipkin/zipkin-go-opentracing"
     version = "v0.2.3"
+
+[[constraint]]
+  name = "github.com/mholt/caddy"
+  version = "0.10.9"
